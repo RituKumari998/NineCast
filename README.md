@@ -153,6 +153,194 @@ const wagmiAdapter = new WagmiAdapter({
 5. **On-Ramp Integration** - Built-in crypto purchase functionality
 6. **Mobile Optimized** - Works seamlessly in mobile wallets
 
+### 📦 Reown Packages Used in NineCast
+
+NineCast utilizes a comprehensive suite of Reown packages to provide seamless wallet connectivity and blockchain interactions. Here's a detailed breakdown of each package:
+
+#### Core Packages
+
+##### 1. `@reown/appkit` (v1.8.11)
+**What it does:**
+- Core AppKit package providing the main React components and functionality
+- Provides `createAppKit()` function to initialize the wallet connection system
+- Includes pre-built UI components for wallet modals, connection flows, and account management
+- Handles wallet discovery, connection state management, and session persistence
+- Supports multiple authentication methods (wallet, email, social)
+
+**Used for:**
+- Main wallet connection interface
+- Modal dialogs for wallet selection
+- Account management UI
+- Network switching interface
+
+**Key Features:**
+- React hooks for wallet state (`useAppKit`, `useAppKitAccount`, `useAppKitState`)
+- Customizable themes and styling
+- SSR/SSG support for Next.js
+- TypeScript definitions included
+
+---
+
+##### 2. `@reown/appkit-adapter-wagmi` (v1.8.11)
+**What it does:**
+- Adapter that bridges Reown AppKit with Wagmi (React hooks for Ethereum)
+- Converts Reown's wallet connections into Wagmi-compatible connectors
+- Enables use of Wagmi hooks (`useAccount`, `useConnect`, `useBalance`, etc.) with Reown wallets
+- Handles network configuration and chain switching
+- Provides SSR support for Next.js applications
+
+**Used for:**
+- Integrating Reown wallets with Wagmi ecosystem
+- Using Wagmi hooks throughout the application
+- Network configuration and chain management
+- Transaction signing and sending
+
+**Key Features:**
+- Seamless Wagmi integration
+- Multi-chain network support
+- Automatic connector management
+- Type-safe with TypeScript
+
+---
+
+##### 3. `@reown/appkit-adapter-ethers` (v1.8.11)
+**What it does:**
+- Adapter for integrating Reown AppKit with Ethers.js library
+- Converts wallet connections to Ethers.js providers and signers
+- Enables direct use of Ethers.js for smart contract interactions
+- Supports both v5 and v6 of Ethers.js
+
+**Used for:**
+- Smart contract interactions using Ethers.js
+- Alternative to Wagmi for developers preferring Ethers.js
+- Direct provider/signer access
+- Legacy dApp compatibility
+
+**Key Features:**
+- Ethers.js v5 and v6 support
+- Provider and signer abstraction
+- Contract interaction helpers
+- Event listening capabilities
+
+---
+
+##### 4. `@reown/appkit-adapter-solana` (v1.8.11)
+**What it does:**
+- Adapter for Solana blockchain integration
+- Enables Solana wallet connections (Phantom, Solflare, etc.)
+- Provides Solana-specific transaction signing
+- Supports Solana program interactions
+
+**Used for:**
+- Multi-chain support including Solana
+- Solana wallet connections
+- SOL and SPL token transactions
+- Solana program interactions
+
+**Key Features:**
+- Native Solana wallet support
+- Transaction signing for Solana
+- SPL token support
+- Program interaction helpers
+
+---
+
+##### 5. `@reown/walletkit` (v1.8.11)
+**What it does:**
+- SDK for wallet developers and advanced integrations
+- Provides authentication and transaction signing features
+- Includes utilities for wallet connection management
+- Offers additional developer tools and utilities
+
+**Used for:**
+- Advanced wallet integration features
+- Custom authentication flows
+- Transaction signing utilities
+- Developer tooling and helpers
+
+**Key Features:**
+- Authentication utilities
+- Transaction signing helpers
+- Wallet management tools
+- Developer-friendly APIs
+
+---
+
+#### Transitive Dependencies (Auto-Installed)
+
+These packages are automatically installed as dependencies of the core packages:
+
+##### `@reown/appkit-common`
+- Shared utilities and types across all Reown packages
+- Common constants and configuration
+- Type definitions and interfaces
+
+##### `@reown/appkit-controllers`
+- Core controllers for wallet state management
+- Connection lifecycle management
+- Session persistence logic
+
+##### `@reown/appkit-pay`
+- Payment and on-ramp functionality
+- Crypto purchase integration
+- Fiat-to-crypto conversion support
+
+##### `@reown/appkit-polyfills`
+- Browser compatibility polyfills
+- Ensures support across different browsers
+- Legacy browser support
+
+##### `@reown/appkit-scaffold-ui`
+- UI scaffolding components
+- Base components for building custom UIs
+- Layout and structure components
+
+##### `@reown/appkit-ui`
+- Pre-built UI components
+- Modal dialogs, buttons, and forms
+- Theming and styling components
+
+##### `@reown/appkit-utils`
+- Utility functions and helpers
+- Address formatting, validation
+- Network utilities
+- Common helper functions
+
+##### `@reown/appkit-wallet`
+- Embedded wallet functionality
+- Email and social login wallets
+- Key management for embedded wallets
+- Wallet recovery features
+
+---
+
+### Package Usage Summary
+
+| Package | Purpose | Primary Use Case |
+|---------|---------|------------------|
+| `@reown/appkit` | Core wallet connection system | Main wallet UI and connection flow |
+| `@reown/appkit-adapter-wagmi` | Wagmi integration | React hooks for wallet state |
+| `@reown/appkit-adapter-ethers` | Ethers.js integration | Smart contract interactions |
+| `@reown/appkit-adapter-solana` | Solana blockchain support | Multi-chain Solana support |
+| `@reown/walletkit` | Advanced wallet tools | Developer utilities and helpers |
+
+### Installation
+
+All Reown packages are installed via pnpm:
+
+```bash
+pnpm install @reown/appkit @reown/appkit-adapter-wagmi @reown/appkit-adapter-ethers @reown/appkit-adapter-solana @reown/walletkit
+```
+
+### Version Compatibility
+
+All packages are versioned at `^1.8.11` to ensure compatibility across the Reown ecosystem. This version provides:
+- Latest features and bug fixes
+- Consistent API across packages
+- TypeScript support
+- React 18 compatibility
+- Next.js 14 support
+
 ---
 
 ## 🏗️ Architecture
