@@ -417,11 +417,14 @@ NEXT_PUBLIC_REOWN_PROJECT_ID=your_project_id_here
 NEXT_PUBLIC_FARCASTER_DEVELOPER_MNEMONIC=your_mnemonic
 NEXT_PUBLIC_FARCASTER_APP_FID=your_fid
 
-# Neynar API (for cast fetching)
-NEYNAR_API_KEY=your_neynar_api_key
+# Neynar API (for cast fetching) - Optional, falls back to mock data if not provided
+NEXT_PUBLIC_NEYNAR_API_KEY=your_neynar_api_key
 
 # MongoDB (optional, for NFT metadata)
 MONGODB_URI=your_mongodb_uri
+
+# App URL
+NEXT_PUBLIC_URL=http://localhost:3000
 ```
 
 ### Development
@@ -532,6 +535,63 @@ When a cast achieves high engagement, our AI identifies:
     "username": "creator"
   }
 }
+```
+
+---
+
+## ✨ Latest Improvements
+
+### Enhanced Cast Feed (v2.0)
+
+We've significantly improved the cast feed component with better error handling and user experience:
+
+#### 🛡️ Robust Error Handling
+- **Automatic Fallback**: If API fails or no API key is provided, automatically uses mock data
+- **Graceful Degradation**: App continues to work even without API access
+- **Better Error Messages**: User-friendly error displays with helpful context
+
+#### 🔧 Environment Variable Support
+- **Optional API Key**: Works without Neynar API key using mock data
+- **Easy Configuration**: Simply add `NEXT_PUBLIC_NEYNAR_API_KEY` to your `.env.local`
+- **Development Ready**: Perfect for local development without API dependencies
+
+#### 🎨 UI/UX Enhancements
+- **Improved Text Wrapping**: Better handling of long cast text with proper line breaks
+- **Fixed Spacing**: Corrected padding and margin for better visual alignment
+- **Enhanced Loading States**: Smoother loading animations
+- **Better Error Display**: Informative error cards with recovery suggestions
+
+#### 📊 Mock Data System
+- **Realistic Examples**: High-quality mock data for testing and demos
+- **Fast Response**: Instant data loading when using mock mode
+- **Consistent Structure**: Mock data matches real API response format
+
+#### 🔄 Smart Data Fetching
+- **5-Minute Cache**: React Query caches data for 5 minutes to reduce API calls
+- **Automatic Retry**: Built-in retry logic for failed requests
+- **Response Validation**: Validates API response structure before using
+
+### Usage Example
+
+```typescript
+// The CastFeed component now automatically handles:
+// - Missing API keys (uses mock data)
+// - API errors (falls back to mock data)
+// - Network issues (shows helpful error message)
+// - Invalid responses (validates and handles gracefully)
+
+// Simply use it in your component:
+import { CastFeed } from '@/components/Home/CastFeed'
+
+<CastFeed />
+```
+
+### Configuration
+
+```env
+# Optional: Add your Neynar API key for real data
+# If omitted, the app will use high-quality mock data
+NEXT_PUBLIC_NEYNAR_API_KEY=your_api_key_here
 ```
 
 ---
