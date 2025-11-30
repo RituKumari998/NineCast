@@ -29,23 +29,145 @@ interface CastFeedResponse {
   casts: Cast[]
 }
 
+// Mock data for fallback
+const getMockCasts = (): Cast[] => [
+  {
+    hash: '0x1234567890abcdef',
+    author: {
+      username: 'commstark',
+      display_name: 'Comm Stark',
+      pfp_url: 'https://i.ibb.co/NdyfX1qx/Monad-Logo-Black-Logo-Mark.png',
+      verifications: ['0x1234567890abcdef'],
+    },
+    text: 'Hot take: Coffee tastes better before you brush your teeth ☕',
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    reactions: {
+      likes_count: 25,
+      recasts_count: 1,
+    },
+    replies: {
+      count: 8,
+    },
+    channel: {
+      name: 'hot-takes',
+    },
+  },
+  {
+    hash: '0xabcdef1234567890',
+    author: {
+      username: 'crypto_whale',
+      display_name: 'Crypto Whale',
+      pfp_url: 'https://i.ibb.co/NdyfX1qx/Monad-Logo-Black-Logo-Mark.png',
+      verifications: [],
+    },
+    text: 'Just discovered this amazing new DeFi protocol on Monad. The gas fees are incredibly low! 🚀',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    reactions: {
+      likes_count: 42,
+      recasts_count: 5,
+    },
+    replies: {
+      count: 12,
+    },
+  },
+  {
+    hash: '0x7890abcdef123456',
+    author: {
+      username: 'web3_dev',
+      display_name: 'Web3 Developer',
+      pfp_url: 'https://i.ibb.co/NdyfX1qx/Monad-Logo-Black-Logo-Mark.png',
+      verifications: ['0xabcdef1234567890'],
+    },
+    text: 'Building on Monad has been a game-changer. The parallel execution is mind-blowing! 💻⚡',
+    timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    reactions: {
+      likes_count: 18,
+      recasts_count: 3,
+    },
+    replies: {
+      count: 6,
+    },
+    channel: {
+      name: 'monad-dev',
+    },
+  },
+  {
+    hash: '0x4567890abcdef123',
+    author: {
+      username: 'farcaster_fan',
+      display_name: 'Farcaster Fan',
+      pfp_url: 'https://i.ibb.co/NdyfX1qx/Monad-Logo-Black-Logo-Mark.png',
+      verifications: [],
+    },
+    text: 'The Farcaster ecosystem is growing so fast! Love seeing all these new mini apps being built. 🎉',
+    timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    reactions: {
+      likes_count: 31,
+      recasts_count: 2,
+    },
+    replies: {
+      count: 9,
+    },
+  },
+  {
+    hash: '0xdef1234567890abc',
+    author: {
+      username: 'blockchain_enthusiast',
+      display_name: 'Blockchain Enthusiast',
+      pfp_url: 'https://i.ibb.co/NdyfX1qx/Monad-Logo-Black-Logo-Mark.png',
+      verifications: ['0xdef1234567890abc'],
+    },
+    text: 'Monad\'s approach to scaling is revolutionary. Can\'t wait to see what the future holds! 🔮',
+    timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    reactions: {
+      likes_count: 27,
+      recasts_count: 4,
+    },
+    replies: {
+      count: 7,
+    },
+  },
+]
+
 async function fetchPopularCasts(): Promise<CastFeedResponse> {
-  // For demo purposes, using mock data since we don't have a real API key
-  // In production, replace this with the actual API call:
+  const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY || ''
   
-  const url = 'https://api.neynar.com/v2/farcaster/feed/user/popular/?fid=249702';
-  const options = {
-    method: 'GET',
-    headers: { 'x-api-key': 'YOUR_NEYNAR_API_KEY' },
+  // If no API key is set, use mock data immediately
+  if (!apiKey || apiKey === 'YOUR_NEYNAR_API_KEY') {
+    await new Promise(resolve => setTimeout(resolve, 800)) // Simulate API delay
+    return { casts: getMockCasts() }
   }
 
-  const response = await fetch(url, options)
-  if (!response.ok) {
-    throw new Error('Failed to fetch casts')
+  try {
+    const url = 'https://api.neynar.com/v2/farcaster/feed/user/popular/?fid=249702'
+    const options = {
+      method: 'GET',
+      headers: { 'x-api-key': apiKey },
+    }
+
+    const response = await fetch(url, options)
+    
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}: ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    
+    // Validate response structure
+    if (data && data.casts && Array.isArray(data.casts)) {
+      return data
+    }
+    
+    throw new Error('Invalid response format from API')
+  } catch (error) {
+    // Fallback to mock data on any error
+    console.warn('Failed to fetch casts from API, using mock data:', error)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    return { casts: getMockCasts() }
   }
-  return response.json()
-  
-//   const mockCasts: Cast[] = [
+}
+
+function CastCard({ cast }: { cast: Cast }) {
 //     {
 //       hash: '0x1234567890abcdef',
 //       author: {
@@ -191,12 +313,12 @@ function CastCard({ cast }: { cast: Cast }) {
       </div>
 
       {/* Cast Content */}
-      <div className="mb-4 pl-18">
-        <p className="text-white text-sm leading-relaxed">{cast.text}</p>
+      <div className="mb-4 pl-[4.5rem]">
+        <p className="text-white text-sm leading-relaxed whitespace-pre-wrap break-words">{cast.text}</p>
       </div>
 
       {/* Interaction Metrics */}
-      <div className="flex items-center gap-6 text-gray-400 text-sm pl-18">
+      <div className="flex items-center gap-6 text-gray-400 text-sm pl-[4.5rem]">
         <div className="flex items-center gap-1">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
@@ -242,8 +364,17 @@ export function CastFeed() {
     return (
       <div className="space-y-4 border border-[#333] rounded-md p-4">
         <h2 className="text-xl font-bold text-left">Popular Casts</h2>
-        <div className="text-red-400 text-center py-4">
-          Error loading casts: {error instanceof Error ? error.message : 'Unknown error'}
+        <div className="bg-gray-900/50 rounded-lg p-4 border border-red-500/30">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-red-400 font-semibold mb-1">Unable to load casts</p>
+              <p className="text-gray-400 text-sm">{error instanceof Error ? error.message : 'Unknown error'}</p>
+              <p className="text-gray-500 text-xs mt-2">Showing cached or mock data...</p>
+            </div>
+          </div>
         </div>
       </div>
     )
