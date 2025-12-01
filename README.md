@@ -355,6 +355,10 @@ All packages are versioned at `^1.8.11` to ensure compatibility across the Reown
 - **Styling**: Tailwind CSS
 - **Type Safety**: TypeScript
 - **Database**: MongoDB (via Upstash Redis for caching)
+  - Connection pooling (2-10 connections)
+  - Automatic retries for reads/writes
+  - Health monitoring capabilities
+  - Optional MongoDB for NFT metadata storage
 
 ### Project Structure
 
@@ -420,8 +424,11 @@ NEXT_PUBLIC_FARCASTER_APP_FID=your_fid
 # Neynar API (for cast fetching) - Optional, falls back to mock data if not provided
 NEXT_PUBLIC_NEYNAR_API_KEY=your_neynar_api_key
 
-# MongoDB (optional, for NFT metadata)
+# MongoDB (optional, for NFT metadata and data storage)
+# Supports connection pooling and automatic retries
 MONGODB_URI=your_mongodb_uri
+# Or use MongoDB Atlas:
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ninecast
 
 # App URL
 NEXT_PUBLIC_URL=http://localhost:3000
@@ -740,6 +747,70 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Discord**: [Join our community](https://discord.gg/ninecast)
 - **Twitter**: [@NineCastApp](https://twitter.com/NineCastApp)
 - **Farcaster**: [@ninecast](https://warpcast.com/ninecast)
+
+---
+
+## 🔧 Backend Architecture
+
+### MongoDB Connection Management
+
+The backend uses an optimized MongoDB connection setup (optional, for NFT metadata):
+
+- **Connection Pooling**: Maintains 2-10 active connections for optimal performance
+- **Automatic Retries**: Retries failed reads/writes automatically
+- **Build-Time Safety**: Gracefully handles missing MongoDB URI during build
+- **Health Monitoring**: Built-in `checkDatabaseHealth()` function for monitoring
+
+**Connection Configuration:**
+```typescript
+// lib/mongodb.ts
+- maxPoolSize: 10 connections
+- minPoolSize: 2 connections
+- maxIdleTimeMS: 30000 (30 seconds)
+- serverSelectionTimeoutMS: 5000
+- socketTimeoutMS: 45000
+- retryWrites: true
+- retryReads: true
+```
+
+### API Helper Utilities
+
+Standardized API response handling via `lib/api-helpers.ts`:
+
+**Available Helpers:**
+- `successResponse(data, status)` - Standardized success responses
+- `errorResponse(error, status, details)` - Error responses
+- `serverErrorResponse(error, details)` - Server errors (500)
+- `validationErrorResponse(message, details)` - Validation errors (400)
+- `notFoundResponse(resource)` - Not found errors (404)
+- `validateRequiredFields(body, fields)` - Request validation
+- `withErrorHandling(handler)` - Async error wrapper
+
+**Example Usage:**
+```typescript
+import { successResponse, validationErrorResponse } from '@/lib/api-helpers';
+
+export async function POST(request: NextRequest) {
+  const validation = validateRequiredFields(body, ['fid']);
+  if (!validation.isValid) {
+    return validationErrorResponse(
+      `Missing fields: ${validation.missingFields.join(', ')}`
+    );
+  }
+  return successResponse({ processed: true });
+}
+```
+
+### Enhanced Error Handling
+
+All API routes now feature:
+- ✅ Consistent error response format
+- ✅ Detailed validation error messages
+- ✅ Proper HTTP status codes
+- ✅ Error logging for debugging
+- ✅ Type-safe error handling
+
+**Note**: NineCast primarily uses Upstash Redis for caching. MongoDB is optional and can be used for NFT metadata storage.
 
 ---
 
